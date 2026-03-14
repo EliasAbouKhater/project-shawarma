@@ -272,19 +272,21 @@ function sizeGauge() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  // R drives everything. Fit within 46% of vw and 38% of vh, capped 240px max.
-  R = Math.max(110, Math.min(240, vw * 0.40, vh * 0.34));
+  // Height budget: reserve for header (~13%), value block (~10%), button (~22%), gaps (~8%)
+  // → gauge canvas gets at most 47% of vh
+  // canvas.height ≈ 2.03 * R  (R above pivot + 0.75R below + 0.28R padding)
+  // → R = (vh * 0.47) / 2.03
+  const rFromH = (vh * 0.47) / 2.03;
+  const rFromW = vw * 0.38;
+  R = Math.max(80, Math.min(rFromH, rFromW, 210));
 
-  // Canvas: wide enough for the 270° arc (135° → 45° clockwise through top).
-  // Leftmost/rightmost x offsets: sin(45°)*R = 0.707*R on each side of CX.
-  // Topmost y offset: -R above CY. Bottommost: sin(45°)*R = 0.707*R below CY.
   const pad = R * 0.14;
-  canvas.width  = R * 2 + pad * 2;           // full diameter + padding
-  canvas.height = R + R * 0.75 + pad * 2;    // R above CY + 0.707R below + padding
+  canvas.width  = R * 2 + pad * 2;
+  canvas.height = R + R * 0.75 + pad * 2;
   CX = canvas.width  / 2;
-  CY = R + pad;   // pivot sits R below top edge
+  CY = R + pad;
 
-  const btnSize = Math.max(90, Math.min(180, R * 0.82));
+  const btnSize = Math.max(90, Math.min(160, R * 0.78));
   const btn = document.getElementById('stop-btn');
   btn.style.width  = btnSize + 'px';
   btn.style.height = btnSize + 'px';

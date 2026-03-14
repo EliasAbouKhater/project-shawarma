@@ -7,12 +7,11 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  body {
-    min-height: 100vh; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
     background: #1a0500;
     font-family: 'Segoe UI', system-ui, sans-serif;
-    overflow: hidden;
     user-select: none;
   }
 
@@ -20,117 +19,108 @@
   #bg-layer {
     position: fixed; inset: 0;
     background-size: cover; background-position: center;
-    background-repeat: no-repeat;
     filter: brightness(.35) saturate(1.2);
     z-index: 0;
   }
   #bg-overlay {
     position: fixed; inset: 0;
     background: radial-gradient(ellipse at center,
-      rgba(26,5,0,0.4) 0%,
-      rgba(26,5,0,0.85) 100%);
+      rgba(26,5,0,0.4) 0%, rgba(26,5,0,0.85) 100%);
     z-index: 1;
   }
 
-  /* ── Main container ── */
+  /* ── Main layout ── */
   #main {
-    position: relative; z-index: 10;
+    position: fixed; inset: 0; z-index: 10;
     display: flex; flex-direction: column;
-    align-items: center; gap: 20px;
-    padding: 20px;
-    width: 100%; max-width: 540px;
+    align-items: center; justify-content: space-evenly;
+    padding: 16px;
   }
 
-  /* ── Logo ── */
-  #logo-wrap { text-align: center; }
+  /* ── Logo / title ── */
+  #header { text-align: center; }
   #logo-img {
-    max-height: 80px; max-width: 200px;
+    max-height: 72px; max-width: 180px;
     object-fit: contain;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.6));
+    margin-bottom: 6px;
+    display: block; margin: 0 auto 6px;
   }
   #shop-name {
     color: #F5C518;
-    font-size: 1.1rem;
+    font-size: clamp(.9rem, 2.5vw, 1.3rem);
     letter-spacing: 3px;
     text-transform: uppercase;
-    margin-top: 6px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    text-shadow: 0 2px 8px rgba(0,0,0,.8);
   }
-
-  /* ── Tagline ── */
   #tagline {
     color: #c08060;
-    font-size: .85rem;
+    font-size: clamp(.7rem, 1.8vw, .9rem);
     letter-spacing: 1px;
-    text-align: center;
+    margin-top: 4px;
   }
 
-  /* ── Canvas gauge ── */
-  #gauge-wrap {
-    position: relative;
-    width: 320px; height: 200px;
-  }
-  #gauge { display: block; }
+  /* ── Gauge ── */
+  #gauge-wrap { position: relative; flex-shrink: 0; }
+  #gauge      { display: block; }
 
-  /* ── Discount label under gauge ── */
+  /* ── Value display ── */
+  #value-block { text-align: center; line-height: 1; }
   #current-value {
-    text-align: center;
-    font-size: 3.5rem;
+    font-size: clamp(2.5rem, 9vw, 5rem);
     font-weight: 900;
     color: #F5C518;
-    text-shadow: 0 0 30px rgba(245,197,24,0.6);
-    line-height: 1;
-    min-height: 60px;
+    text-shadow: 0 0 30px rgba(245,197,24,.6);
     transition: color .1s;
   }
-  #current-value.danger { color: #ff4444; text-shadow: 0 0 30px rgba(255,68,68,0.6); }
+  #current-value.danger { color: #ff4444; text-shadow: 0 0 30px rgba(255,68,68,.6); }
   #pct-label {
-    text-align: center;
     color: #c08060;
-    font-size: .8rem;
-    letter-spacing: 2px;
+    font-size: clamp(.65rem, 1.8vw, .85rem);
+    letter-spacing: 3px;
     text-transform: uppercase;
-    margin-top: -4px;
+    margin-top: 2px;
   }
 
   /* ── STOP button ── */
+  #btn-wrap { position: relative; }
   #stop-btn {
-    width: 200px; height: 200px;
     border-radius: 50%;
-    border: 4px solid rgba(212,84,10,0.6);
+    border: 4px solid rgba(212,84,10,.6);
     background: radial-gradient(circle at 40% 35%,
       #ff6b1a 0%, #D4540A 40%, #8B1A1A 100%);
     box-shadow:
-      0 0 0 8px rgba(212,84,10,0.15),
-      0 8px 40px rgba(212,84,10,0.5),
-      inset 0 2px 8px rgba(255,255,255,0.15);
+      0 0 0 8px rgba(212,84,10,.15),
+      0 8px 40px rgba(212,84,10,.5),
+      inset 0 2px 8px rgba(255,255,255,.15);
     color: #fff;
-    font-size: 2rem;
     font-weight: 900;
     letter-spacing: 3px;
     cursor: pointer;
-    transition: transform .08s, box-shadow .08s;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    outline: none;
-    -webkit-appearance: none;
+    outline: none; -webkit-appearance: none;
+    transition: transform .08s, box-shadow .08s;
+    /* size set by JS */
   }
   #stop-btn:active {
-    transform: scale(.93);
-    box-shadow: 0 0 0 4px rgba(212,84,10,0.15), 0 4px 20px rgba(212,84,10,0.4),
-      inset 0 2px 4px rgba(0,0,0,0.3);
+    transform: scale(.92);
+    box-shadow: 0 0 0 4px rgba(212,84,10,.15),
+      0 4px 20px rgba(212,84,10,.4),
+      inset 0 2px 4px rgba(0,0,0,.3);
   }
-  #stop-btn .btn-sub { font-size: .65rem; letter-spacing: 2px; opacity: .7; margin-top: 4px; }
   #stop-btn:disabled { opacity: .4; cursor: default; }
   #stop-btn.start-mode {
     background: radial-gradient(circle at 40% 35%,
       #F5C518 0%, #c9960a 40%, #7a5500 100%);
-    border-color: rgba(245,197,24,0.6);
-    box-shadow: 0 0 0 8px rgba(245,197,24,0.1),
-      0 8px 40px rgba(245,197,24,0.4),
-      inset 0 2px 8px rgba(255,255,255,0.2);
+    border-color: rgba(245,197,24,.6);
+    box-shadow: 0 0 0 8px rgba(245,197,24,.1),
+      0 8px 40px rgba(245,197,24,.4),
+      inset 0 2px 8px rgba(255,255,255,.2);
     color: #1a0500;
   }
+  #btn-text { font-size: clamp(1.4rem, 5vw, 2.2rem); }
+  #btn-sub  { font-size: clamp(.55rem, 1.8vw, .75rem); letter-spacing: 2px; opacity: .7; margin-top: 4px; }
 
   /* ── Result overlay ── */
   #result-overlay {
@@ -141,111 +131,76 @@
     opacity: 0; pointer-events: none;
     transition: opacity .4s;
   }
-  #result-overlay.visible {
-    opacity: 1; pointer-events: all;
-  }
+  #result-overlay.visible { opacity: 1; pointer-events: all; }
   #result-overlay.win-bg {
     background: radial-gradient(ellipse at center,
-      rgba(26,5,0,0.92) 0%, rgba(26,5,0,0.98) 100%);
+      rgba(26,5,0,.92) 0%, rgba(26,5,0,.98) 100%);
   }
   #result-overlay.lose-bg {
     background: radial-gradient(ellipse at center,
-      rgba(10,0,0,0.95) 0%, rgba(10,0,0,0.98) 100%);
+      rgba(10,0,0,.95) 0%, rgba(10,0,0,.98) 100%);
   }
 
-  .result-emoji { font-size: 5rem; margin-bottom: 16px; animation: bounce 1s infinite; }
-  @keyframes bounce {
-    0%,100% { transform: translateY(0); }
-    50%      { transform: translateY(-12px); }
-  }
-
-  .result-title {
-    font-size: 2rem; font-weight: 900;
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 10px;
+  .result-emoji  { font-size: clamp(3rem,10vw,5rem); margin-bottom: 12px; animation: bounce 1s infinite; }
+  .result-title  {
+    font-size: clamp(1.4rem,5vw,2.2rem); font-weight: 900;
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;
   }
   .result-title.win  { color: #F5C518; text-shadow: 0 0 40px rgba(245,197,24,.7); }
   .result-title.lose { color: #ff5555; }
-
   .result-discount {
-    font-size: 6rem; font-weight: 900;
-    color: #F5C518;
-    text-shadow: 0 0 60px rgba(245,197,24,.8);
-    line-height: 1;
+    font-size: clamp(4rem,16vw,7rem); font-weight: 900;
+    color: #F5C518; text-shadow: 0 0 60px rgba(245,197,24,.8); line-height: 1;
   }
   .result-discount-label {
-    color: #c08060; font-size: .9rem;
-    letter-spacing: 3px; text-transform: uppercase;
-    margin-bottom: 24px;
+    color: #c08060; font-size: clamp(.7rem,2vw,.9rem);
+    letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px;
   }
-  .result-sub {
-    color: #c08060; font-size: 1rem;
-    max-width: 300px; line-height: 1.5;
-  }
+  .result-sub { color: #c08060; font-size: clamp(.85rem,2.5vw,1rem); max-width: 320px; line-height: 1.5; }
   .result-sub strong { color: #F5C518; }
 
   .play-again-btn {
-    margin-top: 28px;
-    padding: 14px 40px;
+    margin-top: 24px;
+    padding: clamp(10px,2vw,14px) clamp(24px,5vw,40px);
     background: linear-gradient(135deg, #D4540A, #8B1A1A);
     border: none; border-radius: 50px;
-    color: #fff; font-size: 1rem; font-weight: 700;
-    letter-spacing: 1px; cursor: pointer;
+    color: #fff; font-size: clamp(.85rem,2.5vw,1rem);
+    font-weight: 700; letter-spacing: 1px; cursor: pointer;
     transition: transform .1s, opacity .2s;
   }
   .play-again-btn:hover  { opacity: .88; }
   .play-again-btn:active { transform: scale(.95); }
 
   /* ── Confetti ── */
-  #confetti-container {
-    position: fixed; inset: 0; z-index: 90;
-    pointer-events: none; overflow: hidden;
-  }
+  #confetti-container { position: fixed; inset: 0; z-index: 90; pointer-events: none; overflow: hidden; }
   .confetti-piece {
     position: absolute; top: -20px;
-    width: 12px; height: 12px;
-    opacity: 0;
-    animation: fall linear forwards;
+    opacity: 0; animation: fall linear forwards;
   }
   @keyframes fall {
     0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
     100% { opacity: .2; transform: translateY(110vh) rotate(720deg); }
   }
-
-  /* ── Pulse ring ── */
-  @keyframes pulse-ring {
-    0%   { transform: scale(1); opacity: .6; }
-    100% { transform: scale(1.35); opacity: 0; }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
   }
-  .pulse-ring {
-    position: absolute; inset: -12px;
-    border-radius: 50%;
-    border: 3px solid #D4540A;
-    animation: pulse-ring 1s ease-out infinite;
-  }
-
-  /* ── Crash shake ── */
   @keyframes crash-shake {
     0%,100% { transform: translate(0,0); }
-    10%     { transform: translate(-8px, 4px); }
-    20%     { transform: translate(8px,-4px); }
-    30%     { transform: translate(-6px, 6px); }
-    40%     { transform: translate(6px,-2px); }
-    50%     { transform: translate(-4px, 4px); }
-    60%     { transform: translate(4px,-4px); }
-    70%     { transform: translate(-2px, 2px); }
-    80%     { transform: translate(2px,-2px); }
+    15%     { transform: translate(-10px, 5px); }
+    30%     { transform: translate(10px,-5px); }
+    45%     { transform: translate(-7px, 7px); }
+    60%     { transform: translate(7px,-3px); }
+    75%     { transform: translate(-4px, 4px); }
+    90%     { transform: translate(4px,-4px); }
   }
-  .shake { animation: crash-shake .5s ease-out; }
+  .shake { animation: crash-shake .55s ease-out; }
 </style>
 </head>
 <body>
 
-<!-- Background -->
 <div id="bg-layer"></div>
 <div id="bg-overlay"></div>
-
-<!-- Confetti container -->
 <div id="confetti-container"></div>
 
 <!-- Result overlay -->
@@ -260,191 +215,230 @@
 
 <!-- Main -->
 <div id="main">
-
-  <!-- Logo + name -->
-  <div id="logo-wrap">
+  <div id="header">
     {% if logo_path %}
       <img id="logo-img" src="{{ url_for('static', filename='uploads/' + logo_path) }}" alt="Logo">
     {% else %}
-      <div style="font-size:3rem;">🌯</div>
+      <div style="font-size:clamp(2rem,6vw,3rem);margin-bottom:6px;">🌯</div>
     {% endif %}
     <div id="shop-name">{{ shop_name }}</div>
+    <div id="tagline">Spin the gauge — grab your discount!</div>
   </div>
 
-  <div id="tagline">Spin the gauge — grab your discount!</div>
-
-  <!-- Gauge canvas -->
   <div id="gauge-wrap">
-    <canvas id="gauge" width="320" height="200"></canvas>
+    <canvas id="gauge"></canvas>
   </div>
 
-  <!-- Value display -->
-  <div id="current-value">—</div>
-  <div id="pct-label">DISCOUNT</div>
+  <div id="value-block">
+    <div id="current-value">—</div>
+    <div id="pct-label">DISCOUNT %</div>
+  </div>
 
-  <!-- Button -->
-  <div style="position:relative; margin-top:8px;">
+  <div id="btn-wrap">
     <button id="stop-btn" class="start-mode" onclick="handleBtn()">
       <span id="btn-text">TAP</span>
-      <span class="btn-sub" id="btn-sub">TO START</span>
+      <span id="btn-sub">TO START</span>
     </button>
   </div>
-
 </div>
 
 <script>
-// ── Config from server ─────────────────────────────────────────────────────
-const MIN_DISC = {{ min_discount | float }};
-const MAX_DISC = {{ max_discount | float }};
-
 {% if bg_path %}
 document.getElementById('bg-layer').style.backgroundImage =
   "url('{{ url_for('static', filename='uploads/' + bg_path) }}')";
 {% else %}
-// Default food-themed gradient
 document.getElementById('bg-layer').style.background =
-  'linear-gradient(135deg, #3d1000 0%, #1a0500 50%, #2d0a00 100%)';
+  'linear-gradient(135deg,#3d1000 0%,#1a0500 50%,#2d0a00 100%)';
 document.getElementById('bg-layer').style.filter = 'brightness(1)';
 {% endif %}
 
 // ── State ──────────────────────────────────────────────────────────────────
 const STATE = { IDLE: 0, RUNNING: 1, DONE: 2 };
-let state      = STATE.IDLE;
-let startTime  = null;   // rAF timestamp at game start
-let durMs      = 8000;
-let crashMs    = null;
-let rafId      = null;
-let currentPct = MIN_DISC;
+let state     = STATE.IDLE;
+let startTime = null;
+let durMs     = 8000;
+let crashMs   = null;
+let rafId     = null;
+let currentPct = 0;
 let crashed    = false;
-let elapsedMs  = 0;      // live elapsed ms, updated each tick
+let elapsedMs  = 0;
 
-// ── Gauge drawing ──────────────────────────────────────────────────────────
+// ── Responsive gauge sizing ────────────────────────────────────────────────
 const canvas = document.getElementById('gauge');
 const ctx    = canvas.getContext('2d');
-const CX = 160, CY = 190, R = 140;
+let CX, CY, R;
 
-// Arc: 210° → −30° (clockwise), standard gauge sweep
-const START_ANG = (210 * Math.PI) / 180;
-const END_ANG   = (-30 * Math.PI) / 180;
-// The positive sweep going counter-clockwise (from 210 to -30 CW = 240° range)
-const SWEEP = 2 * Math.PI - (END_ANG - START_ANG + 2 * Math.PI) % (2 * Math.PI);
-// Simpler: 210 to 330 = 240° sweep going clockwise
-const TOTAL_ANG = (240 * Math.PI) / 180; // 240 degrees total
+function sizeGauge() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // R drives everything. Fit within 46% of vw and 38% of vh, capped 240px max.
+  R = Math.max(110, Math.min(240, vw * 0.40, vh * 0.34));
+
+  // Canvas: wide enough for the 270° arc (135° → 45° clockwise through top).
+  // Leftmost/rightmost x offsets: sin(45°)*R = 0.707*R on each side of CX.
+  // Topmost y offset: -R above CY. Bottommost: sin(45°)*R = 0.707*R below CY.
+  const pad = R * 0.14;
+  canvas.width  = R * 2 + pad * 2;           // full diameter + padding
+  canvas.height = R + R * 0.75 + pad * 2;    // R above CY + 0.707R below + padding
+  CX = canvas.width  / 2;
+  CY = R + pad;   // pivot sits R below top edge
+
+  const btnSize = Math.max(90, Math.min(180, R * 0.82));
+  const btn = document.getElementById('stop-btn');
+  btn.style.width  = btnSize + 'px';
+  btn.style.height = btnSize + 'px';
+
+  drawGauge(currentPct, crashed && state === STATE.DONE);
+}
+
+window.addEventListener('resize', sizeGauge);
+
+// ── Gauge drawing ──────────────────────────────────────────────────────────
+// 135° (lower-left) → 45° (lower-right) CLOCKWISE through the top = 270° sweep
+// In canvas: 135° is lower-left (7-8 o'clock), 45° is lower-right (4-5 o'clock)
+// Clockwise through 270°(top) gives a perfect car-RPM speedometer shape.
+const START_DEG = 135;
+const SWEEP_DEG = 270;
+
+function deg2rad(d) { return d * Math.PI / 180; }
 
 function pctToAngle(pct) {
-  const t = (pct - MIN_DISC) / (MAX_DISC - MIN_DISC);
-  // Start at 210° (bottom-left), go clockwise 240° to 330° (bottom-right but beyond)
-  // In canvas: 0° = right, clockwise positive
-  // 210° from right = 210 * PI/180
-  return (210 + t * 240) * Math.PI / 180;
+  return deg2rad(START_DEG + (pct / 100) * SWEEP_DEG);
 }
 
 function drawGauge(pct, isCrashed) {
-  ctx.clearRect(0, 0, 320, 200);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const t = (pct - MIN_DISC) / (MAX_DISC - MIN_DISC);
-  const valueAngle = pctToAngle(pct);
+  const needleAngle = isCrashed ? deg2rad(START_DEG) : pctToAngle(pct);
+  const t    = pct / 100;
+  const arcW = R * 0.12;
+  const arcR = R - arcW / 2;   // radius of arc centre-line
 
-  // ── Tick marks ──
+  // ── Tick marks & labels (0, 10, 20, … 100) ──
+  const tickOuter = arcR + arcW * 0.55;
+  const tickMajor = arcW * 0.9;
+  const tickMinor = arcW * 0.5;
+  const labelR    = arcR - arcW * 0.85;
+  const fontSize  = Math.max(10, R * 0.1);
+
+  ctx.font         = `${fontSize}px sans-serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+
   for (let i = 0; i <= 10; i++) {
-    const tickT   = i / 10;
-    const tickAng = (210 + tickT * 240) * Math.PI / 180;
-    const isMajor = i % 2 === 0;
-    const r1 = R - (isMajor ? 24 : 14);
-    const r2 = R - 4;
+    const ang = pctToAngle(i * 10);
+    const cos = Math.cos(ang), sin = Math.sin(ang);
+
+    // Major tick
     ctx.beginPath();
-    ctx.moveTo(CX + r1 * Math.cos(tickAng), CY + r1 * Math.sin(tickAng));
-    ctx.lineTo(CX + r2 * Math.cos(tickAng), CY + r2 * Math.sin(tickAng));
-    ctx.strokeStyle = isMajor ? 'rgba(255,245,228,0.5)' : 'rgba(255,245,228,0.2)';
-    ctx.lineWidth = isMajor ? 2 : 1;
+    ctx.moveTo(CX + (tickOuter - tickMajor) * cos, CY + (tickOuter - tickMajor) * sin);
+    ctx.lineTo(CX + tickOuter * cos,                CY + tickOuter * sin);
+    ctx.strokeStyle = 'rgba(255,245,228,0.6)';
+    ctx.lineWidth   = Math.max(1.5, R * 0.015);
     ctx.stroke();
 
-    if (isMajor) {
-      const pctLbl = Math.round(MIN_DISC + tickT * (MAX_DISC - MIN_DISC));
-      const lr = R - 40;
-      ctx.fillStyle = 'rgba(255,245,228,0.5)';
-      ctx.font = '11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(pctLbl + '%', CX + lr * Math.cos(tickAng), CY + lr * Math.sin(tickAng));
+    // Label
+    ctx.fillStyle = 'rgba(255,245,228,0.6)';
+    ctx.fillText(i * 10, CX + labelR * cos, CY + labelR * sin);
+
+    // Minor tick (halfway between majors)
+    if (i < 10) {
+      const mAng = pctToAngle(i * 10 + 5);
+      const mc = Math.cos(mAng), ms = Math.sin(mAng);
+      ctx.beginPath();
+      ctx.moveTo(CX + (tickOuter - tickMinor) * mc, CY + (tickOuter - tickMinor) * ms);
+      ctx.lineTo(CX + tickOuter * mc,               CY + tickOuter * ms);
+      ctx.strokeStyle = 'rgba(255,245,228,0.25)';
+      ctx.lineWidth   = Math.max(1, R * 0.008);
+      ctx.stroke();
     }
   }
 
   // ── Background arc ──
   ctx.beginPath();
-  ctx.arc(CX, CY, R - 10, 210 * Math.PI / 180, 330 * Math.PI / 180, false);
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-  ctx.lineWidth = 18;
-  ctx.lineCap = 'round';
+  ctx.arc(CX, CY, arcR, deg2rad(START_DEG), deg2rad(START_DEG + SWEEP_DEG), false);
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  ctx.lineWidth   = arcW;
+  ctx.lineCap     = 'round';
   ctx.stroke();
 
-  // ── Value arc (colored) ──
-  if (t > 0) {
-    const grad = ctx.createLinearGradient(CX - R, CY, CX + R, CY);
+  // ── Colored value arc ──
+  if (pct > 0) {
+    // Gradient along the arc direction (left → right of gauge)
+    const grad = ctx.createLinearGradient(
+      CX + arcR * Math.cos(deg2rad(START_DEG)), CY + arcR * Math.sin(deg2rad(START_DEG)),
+      CX + arcR * Math.cos(deg2rad(START_DEG + SWEEP_DEG)), CY + arcR * Math.sin(deg2rad(START_DEG + SWEEP_DEG))
+    );
     if (isCrashed) {
-      grad.addColorStop(0,   '#660000');
-      grad.addColorStop(1,   '#ff0000');
-    } else if (t < 0.5) {
-      grad.addColorStop(0,   '#1ab848');
-      grad.addColorStop(0.5, '#F5C518');
-      grad.addColorStop(1,   '#D4540A');
+      grad.addColorStop(0, '#660000');
+      grad.addColorStop(1, '#ff2222');
     } else {
-      grad.addColorStop(0,   '#F5C518');
-      grad.addColorStop(1,   '#cc1111');
+      grad.addColorStop(0,    '#1ab848');
+      grad.addColorStop(0.45, '#F5C518');
+      grad.addColorStop(0.75, '#D4540A');
+      grad.addColorStop(1,    '#cc1111');
     }
     ctx.beginPath();
-    ctx.arc(CX, CY, R - 10, 210 * Math.PI / 180, valueAngle, false);
+    ctx.arc(CX, CY, arcR, deg2rad(START_DEG), pctToAngle(pct), false);
     ctx.strokeStyle = grad;
-    ctx.lineWidth = 18;
-    ctx.lineCap = 'round';
+    ctx.lineWidth   = arcW;
+    ctx.lineCap     = 'round';
     ctx.stroke();
+
+    // Glow dot at arc tip
+    if (!isCrashed) {
+      const gx = CX + arcR * Math.cos(needleAngle);
+      const gy = CY + arcR * Math.sin(needleAngle);
+      const glow = ctx.createRadialGradient(gx, gy, 0, gx, gy, arcW * 1.2);
+      glow.addColorStop(0, t > 0.7 ? 'rgba(255,80,80,0.85)' : 'rgba(245,197,24,0.75)');
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath();
+      ctx.arc(gx, gy, arcW * 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = glow;
+      ctx.fill();
+    }
   }
 
-  // ── Glow on arc tip ──
-  if (!isCrashed && t > 0) {
-    const glowR = R - 10;
-    ctx.beginPath();
-    ctx.arc(CX + glowR * Math.cos(valueAngle), CY + glowR * Math.sin(valueAngle), 10, 0, Math.PI * 2);
-    ctx.fillStyle = t > 0.75 ? 'rgba(255,60,60,0.6)' : 'rgba(245,197,24,0.5)';
-    ctx.fill();
-  }
-
-  // ── Needle ──
-  const needleAng = isCrashed ? 210 * Math.PI / 180 : valueAngle;
-  const needleLen = R - 24;
+  // ── Needle ── (thick, tapered)
+  const needleLen  = arcR - arcW * 0.5;
+  const needleBase = Math.max(5, R * 0.055);  // thick at hub
+  const needleTip  = Math.max(2, R * 0.018);  // thin at tip
   ctx.save();
   ctx.translate(CX, CY);
-  ctx.rotate(needleAng);
-  // Needle shadow
-  ctx.shadowColor = 'rgba(0,0,0,0.6)';
-  ctx.shadowBlur  = 6;
+  ctx.rotate(needleAngle);
+  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowBlur  = R * 0.08;
   ctx.beginPath();
-  ctx.moveTo(-8, 0);
-  ctx.lineTo(needleLen, 0);
-  ctx.strokeStyle = isCrashed ? '#ff3333' : '#ffffff';
-  ctx.lineWidth = 3;
-  ctx.lineCap = 'round';
-  ctx.stroke();
+  ctx.moveTo(-needleBase * 1.5, -needleBase / 2);
+  ctx.lineTo(needleLen, -needleTip / 2);
+  ctx.lineTo(needleLen,  needleTip / 2);
+  ctx.lineTo(-needleBase * 1.5,  needleBase / 2);
+  ctx.closePath();
+  ctx.fillStyle = isCrashed ? '#ff4444' : '#ffffff';
+  ctx.fill();
   ctx.restore();
 
   // ── Center hub ──
+  const hubR = Math.max(10, R * 0.075);
   ctx.beginPath();
-  ctx.arc(CX, CY, 12, 0, Math.PI * 2);
-  ctx.fillStyle = isCrashed ? '#cc0000' : '#D4540A';
-  ctx.shadowColor = 'rgba(212,84,10,0.8)';
-  ctx.shadowBlur  = 10;
+  ctx.arc(CX, CY, hubR, 0, Math.PI * 2);
+  ctx.fillStyle   = isCrashed ? '#cc0000' : '#D4540A';
+  ctx.shadowColor = 'rgba(212,84,10,0.9)';
+  ctx.shadowBlur  = hubR;
   ctx.fill();
-  ctx.shadowBlur = 0;
+  ctx.shadowBlur  = 0;
   ctx.beginPath();
-  ctx.arc(CX, CY, 5, 0, Math.PI * 2);
+  ctx.arc(CX, CY, hubR * 0.4, 0, Math.PI * 2);
   ctx.fillStyle = '#fff5e4';
   ctx.fill();
 
-  // ── Label below needle ──
-  ctx.fillStyle = 'rgba(192,128,96,0.7)';
-  ctx.font = '10px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('DISCOUNT %', CX, CY - R + 18);
+  // ── "DISCOUNT %" label inside arc ──
+  ctx.fillStyle    = 'rgba(192,128,96,0.6)';
+  ctx.font         = `${Math.max(9, R * 0.07)}px sans-serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('DISCOUNT %', CX, CY - R * 0.35);
 }
 
 // ── Animation loop ─────────────────────────────────────────────────────────
@@ -459,48 +453,42 @@ function tick(ts) {
   }
 
   const t = Math.min(elapsedMs / durMs, 1);
-  // Smoothstep ease-in: starts slow, accelerates (RPM feel)
+  // Smoothstep ease-in (RPM build-up feel)
   const eased = t * t * (3 - 2 * t);
-  currentPct = MIN_DISC + eased * (MAX_DISC - MIN_DISC);
+  currentPct = eased * 100;
 
   drawGauge(currentPct, false);
-
-  // Update display
-  const el = document.getElementById('current-value');
-  el.textContent = Math.round(currentPct) + '%';
-  el.classList.toggle('danger', currentPct > MIN_DISC + (MAX_DISC - MIN_DISC) * 0.75);
+  document.getElementById('current-value').textContent = Math.round(currentPct) + '%';
+  document.getElementById('current-value').classList.toggle('danger', currentPct > 65);
 
   rafId = requestAnimationFrame(tick);
 }
 
 function onCrashed() {
   cancelAnimationFrame(rafId);
-  drawGauge(MIN_DISC, true);
+  currentPct = 0;
+  drawGauge(0, true);
   document.getElementById('current-value').textContent = '💥';
   document.getElementById('current-value').classList.add('danger');
   document.getElementById('gauge-wrap').classList.add('shake');
   setTimeout(() => document.getElementById('gauge-wrap').classList.remove('shake'), 600);
-
-  // Record on server
   sendResult(-1);
 }
 
-// ── Button handler ─────────────────────────────────────────────────────────
+// ── Button ─────────────────────────────────────────────────────────────────
 async function handleBtn() {
-  if (state === STATE.IDLE) {
-    await startGame();
-  } else if (state === STATE.RUNNING) {
-    stopGame();
-  }
+  if (state === STATE.IDLE)    await startGame();
+  else if (state === STATE.RUNNING) stopGame();
 }
 
 async function startGame() {
-  state = STATE.RUNNING;
-  crashed = false;
-  startTime = null;
-  currentPct = MIN_DISC;
-  drawGauge(MIN_DISC, false);
-  document.getElementById('current-value').textContent = Math.round(MIN_DISC) + '%';
+  state      = STATE.RUNNING;
+  crashed    = false;
+  startTime  = null;
+  elapsedMs  = 0;
+  currentPct = 0;
+  drawGauge(0, false);
+  document.getElementById('current-value').textContent = '0%';
   document.getElementById('current-value').classList.remove('danger');
 
   const btn = document.getElementById('stop-btn');
@@ -509,7 +497,7 @@ async function startGame() {
   document.getElementById('btn-sub').textContent  = 'TAP NOW!';
 
   try {
-    const res = await fetch('/api/start', { method: 'POST' });
+    const res  = await fetch('/api/start', { method: 'POST' });
     const data = await res.json();
     durMs   = data.duration_ms;
     crashMs = data.crash_ms;
@@ -525,83 +513,74 @@ function stopGame() {
   if (state !== STATE.RUNNING || crashed) return;
   state = STATE.DONE;
   cancelAnimationFrame(rafId);
-
   document.getElementById('stop-btn').disabled = true;
-  // Send elapsed ms — server validates against crash_ms
   sendResult(Math.round(elapsedMs));
 }
 
 async function sendResult(stop_ms) {
-  // stop_ms: -1 = crashed (never stopped), else elapsed ms when player tapped
   try {
-    const res = await fetch('/api/result', {
-      method: 'POST',
+    const res  = await fetch('/api/result', {
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stop_ms })
+      body:    JSON.stringify({ stop_ms })
     });
     const data = await res.json();
-    showResult(data.won, data.discount, data.crash_at, stop_ms < 0);
+    showResult(data.won, data.discount, stop_ms < 0);
   } catch {
     setTimeout(() => resetGame(), 3000);
   }
 }
 
-// ── Result display ─────────────────────────────────────────────────────────
-function showResult(won, discount, crashAt, wasCrashed) {
-  const overlay  = document.getElementById('result-overlay');
-  const emoji    = document.getElementById('result-emoji');
-  const title    = document.getElementById('result-title');
-  const discEl   = document.getElementById('result-discount');
-  const discLbl  = document.getElementById('result-discount-label');
-  const sub      = document.getElementById('result-sub');
-
+// ── Result ─────────────────────────────────────────────────────────────────
+function showResult(won, discount, wasCrashed) {
+  const overlay = document.getElementById('result-overlay');
   overlay.className = 'result-overlay';
 
   if (won) {
-    overlay.classList.add('win-bg', 'visible');
-    emoji.textContent = '🎉';
-    title.textContent = 'YOU WIN!';
-    title.className   = 'result-title win';
+    overlay.classList.add('win-bg');
+    document.getElementById('result-emoji').textContent = '🎉';
+    document.getElementById('result-title').textContent = 'YOU WIN!';
+    document.getElementById('result-title').className   = 'result-title win';
+    const discEl = document.getElementById('result-discount');
     discEl.textContent = Math.round(discount) + '%';
-    discEl.style.display     = '';
-    discLbl.style.display    = '';
-    sub.innerHTML = `Show this to our staff and enjoy your<br><strong>${Math.round(discount)}% discount</strong> on your order!`;
+    discEl.style.display = '';
+    document.getElementById('result-discount-label').style.display = '';
+    document.getElementById('result-sub').innerHTML =
+      `Show this to our staff and enjoy your<br><strong>${Math.round(discount)}% discount</strong> on your order!`;
     launchConfetti();
   } else {
-    overlay.classList.add('lose-bg', 'visible');
-    emoji.textContent = '💥';
-    title.textContent = 'CRASHED!';
-    title.className   = 'result-title lose';
-    discEl.style.display  = 'none';
-    discLbl.style.display = 'none';
+    overlay.classList.add('lose-bg');
+    document.getElementById('result-emoji').textContent = '💥';
+    document.getElementById('result-title').textContent = 'CRASHED!';
+    document.getElementById('result-title').className   = 'result-title lose';
+    document.getElementById('result-discount').style.display = 'none';
+    document.getElementById('result-discount-label').style.display = 'none';
     const msgs = [
       'Better luck next time!',
-      "So close! Give it another spin!",
+      'So close! Give it another spin!',
       "The gauge had other plans! Try again 😄",
       "Almost! Don't give up!",
     ];
-    sub.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    document.getElementById('result-sub').textContent =
+      msgs[Math.floor(Math.random() * msgs.length)];
   }
 
-  setTimeout(() => {
-    overlay.classList.add('visible');
-  }, 100);
+  setTimeout(() => overlay.classList.add('visible'), 80);
 }
 
 // ── Confetti ───────────────────────────────────────────────────────────────
 function launchConfetti() {
   const container = document.getElementById('confetti-container');
-  const colors = ['#F5C518','#D4540A','#ff6b35','#fff5e4','#8B1A1A','#ffcc00','#ff4444'];
-  const shapes = ['●', '■', '▲', '★'];
-
-  for (let i = 0; i < 80; i++) {
+  const colors    = ['#F5C518','#D4540A','#ff6b35','#fff5e4','#8B1A1A','#ffcc00','#ff4444'];
+  const shapes    = ['●','■','▲','★'];
+  for (let i = 0; i < 90; i++) {
     const p = document.createElement('div');
     p.className = 'confetti-piece';
     p.textContent = shapes[Math.floor(Math.random() * shapes.length)];
     p.style.cssText = `
       left: ${Math.random() * 100}vw;
       color: ${colors[Math.floor(Math.random() * colors.length)]};
-      font-size: ${8 + Math.random() * 14}px;
+      font-size: ${8 + Math.random() * 16}px;
       animation-duration: ${1.5 + Math.random() * 2}s;
       animation-delay: ${Math.random() * .8}s;
     `;
@@ -610,7 +589,7 @@ function launchConfetti() {
   setTimeout(() => { container.innerHTML = ''; }, 4000);
 }
 
-// ── Reset ──────────────────────────────────────────────────────────────────
+// ── Reset ───────────────────────────────────────────────────────────────────
 function resetGame() {
   state   = STATE.IDLE;
   crashed = false;
@@ -624,12 +603,12 @@ function resetGame() {
   document.getElementById('btn-sub').textContent  = 'TO START';
   document.getElementById('current-value').textContent = '—';
   document.getElementById('current-value').classList.remove('danger');
-
-  drawGauge(MIN_DISC, false);
+  currentPct = 0;
+  drawGauge(0, false);
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
-drawGauge(MIN_DISC, false);
+sizeGauge();
 </script>
 </body>
 </html>

@@ -194,23 +194,18 @@ def api_start():
         mn, mx, dur = 5.0, 40.0, 8.0
 
     crash_at = round(random.uniform(mn, mx), 2)
-    # How far along (0.0–1.0) the crash happens
-    progress  = (crash_at - mn) / (mx - mn) if mx > mn else 0.5
-    crash_ms  = int(progress * dur * 1000)
+    # Gauge is always 0–100; crash_ms based on position in that range
+    crash_ms  = int((crash_at / 100) * dur * 1000)
 
     session['game'] = {
         'crash_at':  crash_at,
         'crash_ms':  crash_ms,
-        'min':       mn,
-        'max':       mx,
         'dur_ms':    int(dur * 1000),
         'started_at': datetime.utcnow().isoformat(),
     }
 
-    # Send crash_ms to drive the visual animation — the actual discount value
-    # is validated server-side so sending crash_ms is acceptable for this
-    # promotional game (anti-cheat is not a requirement).
-    return jsonify(min=mn, max=mx, duration_ms=int(dur * 1000), crash_ms=crash_ms)
+    # crash_ms drives the visual animation; crash_at kept server-side only
+    return jsonify(duration_ms=int(dur * 1000), crash_ms=crash_ms)
 
 
 @app.route('/api/result', methods=['POST'])
@@ -224,8 +219,6 @@ def api_result():
     crashed  = stop_ms < 0
 
     crash_ms = game['crash_ms']
-    mn       = game['min']
-    mx       = game['max']
     dur_ms   = game['dur_ms']
     crash_at = game['crash_at']
 
@@ -235,12 +228,9 @@ def api_result():
         stop_val = crash_at
     else:
         won      = True
-        progress = stop_ms / dur_ms if dur_ms else 0
-        # Reverse the client ease: smoothstep with 1.05 factor
-        # simple approximation: clamp progress to [0,1] and use linear
-        progress = max(0.0, min(1.0, progress))
-        stop_val = round(mn + progress * (mx - mn), 1)
-        # Ensure stop_val is below crash_at (server-authoritative)
+        # Gauge is 0–100; position = (stop_ms / dur_ms) * 100
+        progress = max(0.0, min(1.0, stop_ms / dur_ms)) if dur_ms else 0
+        stop_val = round(progress * 100, 1)
         stop_val = min(stop_val, round(crash_at - 0.1, 1))
         discount = stop_val
 
@@ -263,9 +253,7 @@ def game():
     return render_template('game.html',
                            shop_name=get_setting('shop_name', 'Shawarma Express'),
                            logo_path=get_setting('logo_path'),
-                           bg_path=get_setting('bg_path'),
-                           min_discount=get_setting('min_discount', '5'),
-                           max_discount=get_setting('max_discount', '40'))
+                           bg_path=get_setting('bg_path'))
 
 
 # ── Bootstrap ───────────────────────────────────────────────────────────────

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>History — {{ shop_name }}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0500;
+    color: #fff5e4;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 32px;
+    background: rgba(212,84,10,0.12);
+    border-bottom: 1px solid rgba(212,84,10,0.3);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; }
+  .nav-brand span { font-size: 1.5rem; }
+  .nav-brand h1 { font-size: 1.1rem; color: #F5C518; letter-spacing: 1px; }
+  .nav-links { display: flex; gap: 16px; }
+  .nav-links a {
+    color: #c08060; text-decoration: none; font-size: .9rem;
+    padding: 6px 14px; border-radius: 20px;
+    transition: background .2s;
+  }
+  .nav-links a:hover, .nav-links a.active {
+    background: rgba(212,84,10,0.3); color: #F5C518;
+  }
+
+  .page { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+  h2 {
+    color: #F5C518; font-size: 1rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  /* Stats */
+  .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+  .stat {
+    flex: 1; min-width: 100px;
+    background: rgba(212,84,10,0.1);
+    border: 1px solid rgba(212,84,10,0.2);
+    border-radius: 10px; padding: 14px; text-align: center;
+  }
+  .stat .val { font-size: 1.6rem; font-weight: 700; color: #F5C518; }
+  .stat .lbl { font-size: .72rem; color: #c08060; margin-top: 3px; }
+
+  /* Table */
+  .table-wrap {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(212,84,10,0.25);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: rgba(212,84,10,0.15); }
+  th {
+    padding: 13px 16px; text-align: left;
+    font-size: .75rem; color: #c08060;
+    letter-spacing: 1px; text-transform: uppercase;
+    border-bottom: 1px solid rgba(212,84,10,0.2);
+  }
+  td {
+    padding: 12px 16px;
+    font-size: .9rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(212,84,10,0.06); }
+
+  .badge-win {
+    background: rgba(80,200,80,0.15);
+    color: #80e880;
+    border: 1px solid rgba(80,200,80,0.3);
+    border-radius: 20px; padding: 3px 10px; font-size: .78rem;
+  }
+  .badge-loss {
+    background: rgba(200,60,60,0.15);
+    color: #ff8888;
+    border: 1px solid rgba(200,60,60,0.3);
+    border-radius: 20px; padding: 3px 10px; font-size: .78rem;
+  }
+  .discount-val { color: #F5C518; font-weight: 700; }
+
+  .empty {
+    text-align: center; padding: 48px; color: #7a5540;
+  }
+  .empty span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <span>🌯</span>
+    <h1>{{ shop_name }} — Admin</h1>
+  </div>
+  <div class="nav-links">
+    <a href="{{ url_for('dashboard') }}">Settings</a>
+    <a href="{{ url_for('history') }}" class="active">History</a>
+    <a href="{{ url_for('game') }}" target="_blank">Open Game</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  {% set total = rows | length %}
+  {% set wins  = rows | selectattr('won', 'equalto', 1) | list | length %}
+  {% set win_rate = ((wins / total * 100) | round(1)) if total else 0 %}
+  {% set won_rows = rows | selectattr('won', 'equalto', 1) | list %}
+  {% set avg_disc = ((won_rows | map(attribute='discount') | sum) / won_rows|length | round(1)) if won_rows else 0 %}
+
+  <div class="stats">
+    <div class="stat"><div class="val">{{ total }}</div><div class="lbl">Total Games</div></div>
+    <div class="stat"><div class="val">{{ wins }}</div><div class="lbl">Wins</div></div>
+    <div class="stat"><div class="val">{{ win_rate }}%</div><div class="lbl">Win Rate</div></div>
+    <div class="stat"><div class="val">{{ avg_disc }}%</div><div class="lbl">Avg Discount Given</div></div>
+  </div>
+
+  <h2>📋 Game History (Last 200)</h2>
+
+  <div class="table-wrap">
+    {% if rows %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date / Time</th>
+          <th>Result</th>
+          <th>Stopped At</th>
+          <th>Crashed At</th>
+          <th>Discount Given</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td style="color:#7a5540;">{{ r.id }}</td>
+          <td>{{ r.played_at }}</td>
+          <td>
+            {% if r.won %}
+              <span class="badge-win">WIN</span>
+            {% else %}
+              <span class="badge-loss">CRASH</span>
+            {% endif %}
+          </td>
+          <td>{{ r.stop_at }}%</td>
+          <td style="color:#ff8080;">{{ r.crash_at }}%</td>
+          <td>
+            {% if r.won %}
+              <span class="discount-val">{{ r.discount }}%</span>
+            {% else %}
+              <span style="color:#7a5540;">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">
+      <span>🎮</span>
+      No games played yet. Open the game window to start!
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+</body>
+</html>

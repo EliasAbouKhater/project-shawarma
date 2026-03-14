@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Login — Project Shawarma</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1a0500 0%, #3d1000 50%, #1a0500 100%);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(212, 84, 10, 0.4);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 360px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    text-align: center;
+  }
+
+  .icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    color: #F5C518;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  p.sub {
+    color: #c08060;
+    font-size: 0.85rem;
+    margin-bottom: 32px;
+  }
+
+  input[type=password] {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(212,84,10,0.5);
+    border-radius: 10px;
+    color: #fff5e4;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color .2s;
+    margin-bottom: 16px;
+  }
+
+  input[type=password]:focus {
+    border-color: #F5C518;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #D4540A, #8B1A1A);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+  }
+
+  button:hover  { opacity: .9; }
+  button:active { transform: scale(.98); }
+
+  .error {
+    background: rgba(200,0,0,0.2);
+    border: 1px solid rgba(200,0,0,0.5);
+    border-radius: 8px;
+    color: #ff8080;
+    padding: 10px;
+    font-size: .85rem;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">🌯</div>
+  <h1>Admin Panel</h1>
+  <p class="sub">Project Shawarma</p>
+
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST">
+    <input type="password" name="password" placeholder="Password" autofocus required>
+    <button type="submit">ENTER</button>
+  </form>
+</div>
+</body>
+</html>
